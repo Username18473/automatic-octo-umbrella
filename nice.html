@@ -1,28 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Web Proxy for School</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini FNF-style Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    .arrow {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: gray;
+      opacity: 0.8;
+      border: 2px solid white;
+    }
+    .up { top: 0; left: 50%; transform: translateX(-50%) rotate(0deg); }
+    .down { bottom: 0; left: 50%; transform: translateX(-50%) rotate(180deg); }
+    .left { top: 50%; left: 0; transform: translateY(-50%) rotate(-90deg); }
+    .right { top: 50%; right: 0; transform: translateY(-50%) rotate(90deg); }
+
+    .note {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: red;
+      transition: top 0.01s linear;
+    }
+  </style>
 </head>
 <body>
-<header class="bg-dark text-white text-center p-4">Web Proxy for School</header>
-<section id="proxy" class="container mt-5">
-<div class="row justify-content-center">
-<div class="col-md-6">
-<h2>Enter URL to Access</h2>
-<form id="proxyForm">
-<div class="form-group">
-<input type="text" class="form-control" id="url" placeholder="Enter URL" required>
-</div>
-<button type="submit" class="btn btn-primary w-100">Access Website</button>
-</form>
-</div>
-</div>
-</section>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="script.js"></script>
+  <h1>Mini FNF-style Game</h1>
+  <p>Press Arrow Keys in Time!</p>
+  <div id="game">
+    <div class="arrow up"></div>
+    <div class="arrow down"></div>
+    <div class="arrow left"></div>
+    <div class="arrow right"></div>
+  </div>
+
+  <script>
+    const game = document.getElementById("game");
+    const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+
+    function spawnNote(dir) {
+      const note = document.createElement("div");
+      note.classList.add("note");
+      note.dataset.dir = dir;
+
+      const startX = {
+        ArrowUp: window.innerWidth / 2 - 25,
+        ArrowDown: window.innerWidth / 2 - 25,
+        ArrowLeft: 25,
+        ArrowRight: window.innerWidth - 75
+      }[dir];
+
+      note.style.left = startX + "px";
+      note.style.top = "0px";
+      game.appendChild(note);
+    }
+
+    function dropNotes() {
+      const dir = arrows[Math.floor(Math.random() * arrows.length)];
+      spawnNote(dir);
+    }
+
+    setInterval(dropNotes, 1000);
+
+    function updateNotes() {
+      document.querySelectorAll(".note").forEach(note => {
+        let top = parseInt(note.style.top);
+        top += 4;
+        note.style.top = top + "px";
+
+        if (top > window.innerHeight) note.remove();
+      });
+    }
+    setInterval(updateNotes, 20);
+
+    window.addEventListener("keydown", e => {
+      if (!arrows.includes(e.key)) return;
+
+      document.querySelectorAll(".note").forEach(note => {
+        const noteTop = parseInt(note.style.top);
+        const dir = note.dataset.dir;
+        if (e.key === dir && noteTop > window.innerHeight - 100 && noteTop < window.innerHeight - 30) {
+          note.remove();
+          console.log("Hit!", dir);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
+
